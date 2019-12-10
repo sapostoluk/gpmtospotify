@@ -6,7 +6,7 @@ import json
 from gmusicapi import Mobileclient
 import codecs
 
-LIBRARY = 'gpm_library.json'
+LIBRARY = 'gpm_library.txt'
 
 def touch_file(name):
     """
@@ -34,18 +34,15 @@ def file_write_json(filename, container):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('username', action='store',
-                        help='Stores username')
-    parser.add_argument('password', action='store',
-                        help='Stores password')
     parser.add_argument('--playlist', action='store',
                         help='Stores playlist')
     return parser.parse_args()
 
 
-def authenticate(username, password):
+def authenticate():
     api = Mobileclient()
-    api.login(username, password, Mobileclient.FROM_MAC_ADDRESS)
+    api.perform_oauth(open_browser=True)
+    api.oauth_login(Mobileclient.FROM_MAC_ADDRESS)
     return api
 
 
@@ -64,9 +61,9 @@ def get_playlists():
 
 def main():
     args = parse_args()
-    username, password, playlist = args.username, args.password, args.playlist
+    playlist = args.playlist
 
-    api = authenticate(username, password)
+    api = authenticate()
     library = api.get_all_songs()
     playlists = api.get_all_user_playlist_contents()
 
